@@ -6,7 +6,7 @@
 /*   By: saxiao <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/25 01:27:08 by saxiao            #+#    #+#             */
-/*   Updated: 2017/11/27 17:13:14 by saxiao           ###   ########.fr       */
+/*   Updated: 2017/11/28 09:59:32 by saxiao           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,12 @@ int		get_next_line(const int fd, char **line)
 	i = 0;
 	j = 0;
 	line_ct = 0;
-	//end_line = 0;
-	//ft_putstr(stock);
+	if (!(line = (char **)malloc(sizeof(char *))))
+		return (-1);
+	printf("   222222222222222 %s\n",stock);
 	while (i < BUFF_SIZE && stock[i] && stock[i] != '\n')
-	{
 		i++;
-		printf("i here is %d \n", i);
-	}
+	printf("i here =%d\n",i);
 	if (stock[i] == '\n')
 	{
 		if (!(*line = (char *)malloc(i + 1)))
@@ -47,69 +46,67 @@ int		get_next_line(const int fd, char **line)
 		*line = ft_strncpy(*line, stock, i);
 		while (i + 1 < BUFF_SIZE)
 			stock[j++] = stock[i++ + 1];
+		printf("line here=%s\n",*line);
 		return (1);
 	}
 	line_ct = i;
-	ft_putnbr(i);
-	if (!(temp = (char *)malloc(line_ct)))
-		return (-1);
-	temp = ft_strncpy(temp, (const char *)stock, i);
-	printf("here is temp %s \n",temp);
-	i = 0;
+	printf("i2222 here =%d\n",i);
+	if (!line_ct)
+	{
+		if (!(temp = (char *)malloc(line_ct)))
+			return (-1);
+		temp = ft_strncpy(temp, (const char *)stock, i);
+		i = 0;
+	}
 	while (1)
 	{
 		j = 0;
-		printf("test 00000000000000000\n");
 		if (!(buff = (char *)malloc(BUFF_SIZE)))
 			return (-1);
 		i = read(fd, buff, BUFF_SIZE);
-		ft_putendl(buff);
+		printf("i 33333 here=%d\n",i);
 		if ( i == -1)
 			return (-1);
 		if (!i)
+		{
+			printf("i is 0 here 55555");
+			*line = (char *)malloc(line_ct + j + 1);
+			*line = ft_memmove (*line, temp, line_ct);
 			return (0);
+		}
 		while (j < BUFF_SIZE && buff[j] && buff[j] != '\n')
 			j++;
-		ft_putnbr(j);
-		printf("333333333 here  \n");
-		printf("buff =%s \n", buff);
+		printf("j here =%d\n",j);
 		if (buff[j] != '\n')
 		{
 			line_ct = line_ct + BUFF_SIZE;
 			if (!(add = (char *)malloc(line_ct)))
 				return (-1);
+			printf("line_ct 444444 here=%d\n",line_ct);
 			add = ft_strcpy (add, temp);
-			printf("test 1111 add =%s \n",add);
 			add = ft_strncat(add, (const char *)buff, BUFF_SIZE);
-			printf("test 2222 add =%s \n",add);
-			free(temp);
-			free(buff);
+			//free(temp);
+			//free(buff);
 			temp = add;
 			//	free (add);
-			printf("temp =%s \n",temp);
 		}
 		else
 		{
-			printf("enter here or not ?? \n");
-			printf("buff is =%s\n",buff);
-			printf("line_ct is =%d\n", line_ct);
-			printf("j =%d\n",j);
-
-			line = (char **)malloc(sizeof(char *));
+			printf("j 6666666666 here =%d\n",j);
 			*line = (char *)malloc(line_ct + j + 1);
+			ft_bzero(*line, line_ct + j + 1);
 			if (!*line)
 				return (-1);
-			ft_putnbr(j);
-			//ft_putendl("here 6666666666666666");
-			*line = ft_memmove (*line, temp, line_ct);
-			printf("here 5555555555555555 *line =%s\n",*line);
-			*line = ft_strncat(*line, (const char *)buff, j);
-			ft_putendl(*line);
+			printf("test here 7777777777777777777\n");
+			if (temp)
+			{
+				line = ft_memmove (*line, temp, line_ct);
+			}
+			printf("test here 8888888888888888888888\n");
+			*line = ft_strlcat(*line, (const char *)buff, line_ct + j + 1);
+			printf("test here 99999999999999999999\n");
 			ft_bzero(stock, BUFF_SIZE);
 			temp = (char *)ft_memmove((void *)stock, (const void *)(buff + j + 1), BUFF_SIZE - j);
-			
-			printf("end temp =%s \n",temp);
-			printf("end stock =%s \n",stock);
 			return (1);
 		}
 	}
@@ -126,15 +123,11 @@ int main(int ac, char **av)
 	(void) av;
 
 	//fd = 1;
-	line = 0;
 	fd = open(av[1], O_RDONLY);
+	line = NULL;
 	//write(1,"nihao\nhuhu\n\nsa\nlulu",20);
-	while (get_next_line(fd ,line))
-	{
-		ft_putstr(*line);
-		ft_putendl("");
-		ft_putendl("above is in the main");
-	}
+	get_next_line(fd ,line);
+	ft_putendl(*line);
 	return (0);
 }
 
